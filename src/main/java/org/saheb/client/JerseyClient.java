@@ -3,6 +3,9 @@ package org.saheb.client;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -23,36 +26,35 @@ public class JerseyClient
 {
 	public static void main(String[] args) throws IOException 
 	{
-		System.out.println("");
-		httpGETCollectionExample();
+		//System.out.println("");
+		//httpGETCollectionExample();
 		/*httpGETEntityExample();
 		httpPOSTMethodExample();
 		httpPUTMethodExample();
 		httpDELETEMethodExample();*/
+		ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+		service.scheduleAtFixedRate(runnable, 0, 5, TimeUnit.SECONDS);
 	}
 	
 	private static void httpGETCollectionExample() 
 	{
-		HttpAuthenticationFeature feature = HttpAuthenticationFeature.basicBuilder()
+		/*HttpAuthenticationFeature feature = HttpAuthenticationFeature.basicBuilder()
 																    .nonPreemptive()
 																    .credentials("howtodoinjava", "password")
 																    .build();
 
 		ClientConfig clientConfig = new ClientConfig();
-		clientConfig.register(feature) ;
+		clientConfig.register(feature) ;*/
 
-		Client client = ClientBuilder.newClient( clientConfig );
-		WebTarget webTarget = client.target("http://localhost:8080/RestAuth/rest").path("employees");
+		Client client = ClientBuilder.newClient();
+		WebTarget webTarget = client.target("http://localhost:8080/services-status/rs").path("status");
 		
 		Invocation.Builder invocationBuilder =	webTarget.request(MediaType.APPLICATION_JSON);
 		Response response = invocationBuilder.get();
 		System.out.println(response);
 		if(response.getStatus() == 200) {
-			Employees employees = response.readEntity(Employees.class);
-			List<Employee> listOfEmployees = employees.getEmployeeList();
-				
-			System.out.println(response.getStatus());
-			System.out.println(Arrays.toString( listOfEmployees.toArray(new Employee[listOfEmployees.size()]) ));
+			Employee employee = response.readEntity(Employee.class);
+			System.out.println(employee.getName());
 		}
 		
 	}
